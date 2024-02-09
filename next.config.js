@@ -4,4 +4,4 @@ const nextConfig = {
   basePath: '/donde-alquilo'
 };
 
-export default nextConfig;
+module.exports = nextConfig
