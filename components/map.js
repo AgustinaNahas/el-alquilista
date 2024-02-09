@@ -5,7 +5,8 @@ import data from './data.js';
 import caba from './caba.js';
 
 export default function Map() {
-    mapboxgl.accessToken = process.env.TOKEN;
+
+    mapboxgl.accessToken = process.env.NEXT_PUBLIC_TOKEN;
 
     const mapContainer = useRef(null);
     const map = useRef(null);
