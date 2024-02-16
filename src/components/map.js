@@ -16,6 +16,8 @@ export default function CabaMap() {
     const [fullData, setFullData] = useState([]);
     const [filtered, setFiltered] = useState([]);
     const [sueldo, setSueldo] = useState(210000);
+    const [porcentaje, setPorcentaje] = useState(100);
+    const [paso, setPaso] = useState(0);
 
     const mobile = IsMobile();
 
@@ -37,14 +39,12 @@ export default function CabaMap() {
     }, []);
 
     useEffect(() => {
-        // console.log(fullData)
-        // console.log(fullData.features)
         if (fullData && fullData.features) {
 
             let fullCopy = JSON.parse(JSON.stringify(fullData.features))
 
             var f = fullCopy.filter((barrio) => {
-                return barrio.properties['INDEX'] < sueldo
+                return barrio.properties['INDEX'] < sueldo * (porcentaje/100)
             })
 
             var dataFiltered = JSON.parse(JSON.stringify(fullData));
@@ -54,7 +54,7 @@ export default function CabaMap() {
     
         }
 
-    }, [fullData, sueldo])
+    }, [fullData, sueldo, porcentaje])
 
     const layerStyle = {
         'type': 'fill',
@@ -116,7 +116,7 @@ export default function CabaMap() {
                         </Layer>
                     </Source>                
             </Map>)}
-            <Cuadro sueldo={sueldo} setSueldo={setSueldo} filtered={filtered} />
+            <Cuadro sueldo={sueldo} setSueldo={setSueldo} filtered={filtered} porcentaje={porcentaje} setPorcentaje={setPorcentaje} paso={paso} setPaso={setPaso} />
         </div>
         
     );
