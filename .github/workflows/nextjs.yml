@@ -48,6 +48,7 @@ jobs:
             echo "Unable to determine package manager"
             exit 1
           fi
+          npm config set legacy-peer-deps=true
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
