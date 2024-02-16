@@ -7,6 +7,7 @@ import Map, {
     Layer,
   } from "react-map-gl";
 import { Slider, Typography } from '@mui/material';
+import Cuadro from './cuadro.js';
 
 
 export default function CabaMap() {
@@ -65,34 +66,29 @@ export default function CabaMap() {
       };
 
     return (
-        <div style={{ padding: 50 }}>
-                <Typography component="h2">Ingresá tu sueldo</Typography>
-                <Typography component="h2">{sueldo}</Typography>
-
-                {(!filtered || !filtered.features) &&  <Typography component="h2">Ingresá tu sueldo</Typography>}
-                {filtered && filtered.features && filtered.features.length <= 0 && <Typography component="h2">Con ese presupuesto no hay deptos en alquiler en CABA</Typography>}
-                {filtered && filtered.features && filtered.features.length > 0 && filtered.features.length < 10 && <Typography component="h2">No pareciera que haya muchos barrios para alquilar con ese presupuesto</Typography>}
-                {filtered && filtered.features && filtered.features.length >= 10 && filtered.features.length < 30 && <Typography component="h2">Ese presupuesto nos da algunas opciones para alquilar</Typography>}
-                {filtered && filtered.features && filtered.features.length >= 30 && <Typography component="h2">Bue, el millonario</Typography>}
-                
-                <Slider min={100000} max={1000000} step={10000} defaultValue={210000} aria-label="Default" 
-                valueLabelDisplay="none" onChange={(a) => setSueldo(a.target.value) } />
+        <div style={{ width: '100vw', height: '100vh' }}>
             {filtered && <Map
                 mapStyle="mapbox://styles/mapbox/streets-v9"
                 mapboxAccessToken={process.env.NEXT_PUBLIC_TOKEN}
                 boxZoom={false}
-                scrollZoom={false}
+                // scrollZoom={false}
                 style={{
-                    height: '75vh',
-                    width: '80vw'
+                    height: '100vh',
+                    width: '100vw'
                 }}
-                initialViewState={{longitude: -58.44504529638047, latitude: -34.61334039657031, zoom: 11}}
+                // onMove={(a) => {console.log(a)}}
+                initialViewState={{
+                    longitude: -58.50330169991081, 
+                    latitude: -34.61621393391216, 
+                    zoom: 11.35}}
                 >
                     <Source id="barrios" type="geojson" data={filtered}>
                         <Layer {...layerStyle}>
                         </Layer>
                     </Source>                
             </Map>}
-      </div>
+            <Cuadro sueldo={sueldo} setSueldo={setSueldo} filtered={filtered} />
+        </div>
+        
     );
   }
