@@ -79,11 +79,18 @@ export default function CabaMap() {
                     height: '100vh',
                     width: '100vw'
                 }}
-                onMove={(a) => {console.log(a)}}
+                onMove={(a) => {}}
+                onLoad={(a) => {
+                    a.target.setZoom(10.20)
+                    for (let index = 0; index < 100000; index++) {
+                        console.log()                        
+                    }
+                    a.target.flyTo({ center: [-58.45689200256368, -34.55322214007016] })
+                }}
                 initialViewState={{
-                    longitude: -58.44642913215763, 
-                    latitude: -34.57325524929211, 
-                    zoom: 10.25}}
+                    longitude: -58.44493682767809, 
+                    latitude: -34.46406573521092, 
+                    zoom: 10.23}}
                 >
                     <Source id="barrios" type="geojson" data={filtered}>
                         <Layer {...layerStyle}>

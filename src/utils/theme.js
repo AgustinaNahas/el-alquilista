@@ -6,9 +6,17 @@ export const theme = createTheme({
         secondary: { main: '#FFD500'}
     },
     typography: {
-      fontFamily: "'Roboto Slab', serif;"
+        h3: {
+            fontFamily: "'Roboto Slab', serif;"
+        },
+        h5: {
+            fontFamily: "'Roboto Slab', serif;"
+        }
     },
     '.MuiTextField-root': {
         color: "white"
+    },
+    '.MuiChip-root': {
+        fontWeight: 700
     }
   });
