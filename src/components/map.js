@@ -8,6 +8,7 @@ import Map, {
   } from "react-map-gl";
 import { Slider, Typography } from '@mui/material';
 import Cuadro from './cuadro.js';
+import { IsMobile } from '../utils/mobile.js';
 
 
 export default function CabaMap() {
@@ -15,6 +16,8 @@ export default function CabaMap() {
     const [fullData, setFullData] = useState([]);
     const [filtered, setFiltered] = useState([]);
     const [sueldo, setSueldo] = useState(210000);
+
+    const mobile = IsMobile();
 
     useEffect(() => {
         caba.features.map((f) => {
@@ -29,13 +32,13 @@ export default function CabaMap() {
 
         setFullData(caba)
         // setFiltered(caba)
-        console.log(caba)
+        // console.log(caba)
 
     }, []);
 
     useEffect(() => {
-        console.log(fullData)
-        console.log(fullData.features)
+        // console.log(fullData)
+        // console.log(fullData.features)
         if (fullData && fullData.features) {
 
             let fullCopy = JSON.parse(JSON.stringify(fullData.features))
@@ -67,7 +70,26 @@ export default function CabaMap() {
 
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
-            {filtered && <Map
+            {filtered && (mobile ? <Map
+                mapStyle="mapbox://styles/mapbox/streets-v9"
+                mapboxAccessToken={process.env.NEXT_PUBLIC_TOKEN}
+                boxZoom={false}
+                // scrollZoom={false}
+                style={{
+                    height: '100vh',
+                    width: '100vw'
+                }}
+                onMove={(a) => {console.log(a)}}
+                initialViewState={{
+                    longitude: -58.44642913215763, 
+                    latitude: -34.57325524929211, 
+                    zoom: 10.25}}
+                >
+                    <Source id="barrios" type="geojson" data={filtered}>
+                        <Layer {...layerStyle}>
+                        </Layer>
+                    </Source>                
+            </Map> : <Map
                 mapStyle="mapbox://styles/mapbox/streets-v9"
                 mapboxAccessToken={process.env.NEXT_PUBLIC_TOKEN}
                 boxZoom={false}
@@ -86,7 +108,7 @@ export default function CabaMap() {
                         <Layer {...layerStyle}>
                         </Layer>
                     </Source>                
-            </Map>}
+            </Map>)}
             <Cuadro sueldo={sueldo} setSueldo={setSueldo} filtered={filtered} />
         </div>
         
