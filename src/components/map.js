@@ -9,15 +9,73 @@ import Map, {
 import { Slider, Typography } from '@mui/material';
 import Cuadro from './cuadro.js';
 import { IsMobile } from '../utils/mobile.js';
+import getAlquileres from './alquileres.js';
+import getDolarHoy from './dolarHoy.js';
 
 
 export default function CabaMap() {
     
     const [fullData, setFullData] = useState([]);
     const [filtered, setFiltered] = useState([]);
+    const [alquileres, setAlquileres] = useState([]);
     const [sueldo, setSueldo] = useState(210000);
     const [porcentaje, setPorcentaje] = useState(100);
     const [paso, setPaso] = useState(0);
+    const [dolarHoy, setDolarHoy] = useState(1000);
+    const [aceptaDolares, setAceptaDolares] = useState(false);
+
+    const [precioDolares, setPrecioDolares] = useState(0);
+    const [precio, setPrecio] = useState(0);
+
+
+    const barrios = ["Chacarita",
+    "Paternal",
+    "Villa Crespo",
+    "Villa del Parque",
+    "Almagro",
+    "Caballito",
+    "Villa Santa Rita",
+    "Monte Castro",
+    "VILLA REAL",
+    "Flores",
+    "Floresta",
+    "Constitucion",
+    "San Cristobal",
+    "Boedo",
+    "Velez Sarsfield",
+    "Villa Luro",
+    "PARQUE PATRICIOS",
+    "Mataderos",
+    "VILLA LUGANO",
+    "San Telmo",
+    "Saavedra",
+    "Coghlan",
+    "Villa Urquiza",
+    "Colegiales",
+    "Balvanera",
+    "Villa Gral. Mitre",
+    "Parque Chas",
+    "AGRONOMIA",
+    "Villa Ortuzar",
+    "Barracas",
+    "PARQUE AVELLANEDA",
+    "Parque Chacabuco",
+    "NUEVA POMPEYA",
+    "Palermo",
+    "VILLA RIACHUELO",
+    "VILLA SOLDATI",
+    "Villa Pueyrredon",
+    "Villa Devoto",
+    "Liniers",
+    "VERSALLES",
+    "PUERTO MADERO",
+    "Monserrat",
+    "San Nicolas",
+    "Belgrano",
+    "Recoleta",
+    "Retiro",
+    "Nuñez",
+    "BOCA"]
 
     const mobile = IsMobile();
 
@@ -34,37 +92,81 @@ export default function CabaMap() {
 
         setFullData(caba)
         // setFiltered(caba)
-        // console.log(caba)
+        console.log(caba)
 
     }, []);
 
+    const loadAlquileres = async () => {
+        const alq = await getAlquileres();
+        setAlquileres(alq)
+    }
+
+    const loadDolarHoy = async () => {
+        const dhoy = await getDolarHoy();
+        setDolarHoy(dhoy)
+    }
+
     useEffect(() => {
-        if (fullData && fullData.features) {
+        if (alquileres.length === 0) loadAlquileres();
+        loadDolarHoy();
+    }, []);
+
+
+    useEffect(() => {
+        if (aceptaDolares) setPrecioDolares(sueldo * (porcentaje/100) / dolarHoy)
+        setPrecio(sueldo * (porcentaje/100))
+
+        console.log(sueldo * (porcentaje/100) / dolarHoy, sueldo * (porcentaje/100))
+    }, [sueldo, porcentaje, aceptaDolares]);
+
+    useEffect(() => {
+        if (fullData && fullData.features && alquileres.length > 0) {
 
             let fullCopy = JSON.parse(JSON.stringify(fullData.features))
 
-            var f = fullCopy.filter((barrio) => {
-                return barrio.properties['INDEX'] < sueldo * (porcentaje/100)
+            fullCopy.map((barrio) => {
+                const totales = alquileres.filter((a) => {
+                    const b_ind = barrios[parseInt(a.BARRIO)]
+                    if (aceptaDolares) return barrio.properties['BARRIO'] === b_ind
+                    else return barrio.properties['BARRIO'] === b_ind && a.CURRENCY !== "USD"
+                }).length
+
+                const disponibles = alquileres.filter((a) => {
+                    const b_ind = barrios[parseInt(a.BARRIO)]
+
+                    if (aceptaDolares) return barrio.properties['BARRIO'] === b_ind && ((a.AMOUNT < precio && a.CURRENCY !== "USD") || (a.AMOUNT < precioDolares && a.CURRENCY === "USD"))
+                    return barrio.properties['BARRIO'] === b_ind && a.AMOUNT < precio && a.CURRENCY !== "USD"
+                }).length
+
+                const pdisp = disponibles / totales
+
+                barrio.properties.totales = totales;
+                barrio.properties.disponibles = disponibles;
+                barrio.properties.porcentaje = pdisp * 100;
+
+                return barrio;
             })
 
             var dataFiltered = JSON.parse(JSON.stringify(fullData));
-            dataFiltered.features = f;
+            dataFiltered.features = fullCopy;
     
             setFiltered(dataFiltered)
+
+            console.log(dataFiltered)
     
         }
 
-    }, [fullData, sueldo, porcentaje])
+    }, [fullData, alquileres, precio, precioDolares, aceptaDolares ])
 
     const layerStyle = {
         'type': 'fill',
         'source-id': 'barrios',
         'paint': {              
             'fill-color': {
-                property: 'INDEX',
-                stops: [[200000, '#ffff00'], [600000, '#ff0000']]
+                property: 'porcentaje',
+                stops: [[0, '#EC607E'], [50, '#FFD500'], [100, '#A7D5C2']]
             },
-            'fill-opacity': 0.5
+            'fill-opacity': 0.8
         }
       };
 
@@ -116,7 +218,13 @@ export default function CabaMap() {
                         </Layer>
                     </Source>                
             </Map>)}
-            <Cuadro sueldo={sueldo} setSueldo={setSueldo} filtered={filtered} porcentaje={porcentaje} setPorcentaje={setPorcentaje} paso={paso} setPaso={setPaso} />
+            <Cuadro 
+                filtered={filtered} 
+                sueldo={sueldo} setSueldo={setSueldo} 
+                porcentaje={porcentaje} setPorcentaje={setPorcentaje} 
+                paso={paso} setPaso={setPaso}
+                aceptaDolares={aceptaDolares} setAceptaDolares={setAceptaDolares}
+                />
         </div>
         
     );
