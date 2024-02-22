@@ -75,13 +75,13 @@ jobs:
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
       - name: Build with Next.js
+        env:
+          NEXT_PUBLIC_TOKEN: ${{ secrets.NEXT_PUBLIC_TOKEN }}
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./out
-        env:
-          NEXT_PUBLIC_TOKEN: ${{ env.NEXT_PUBLIC_TOKEN }}
 
   # Deployment job
   deploy:
@@ -92,7 +92,7 @@ jobs:
     needs: build
     steps:
       - name: Deploy to GitHub Pages
+        env:
+          NEXT_PUBLIC_TOKEN: ${{ secrets.NEXT_PUBLIC_TOKEN }}
         id: deployment
         uses: actions/deploy-pages@v4
-        env:
-          NEXT_PUBLIC_TOKEN: ${{ env.NEXT_PUBLIC_TOKEN }}
