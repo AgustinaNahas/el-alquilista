@@ -22,7 +22,7 @@ export default function CabaMap() {
     const [porcentaje, setPorcentaje] = useState(100);
     const [paso, setPaso] = useState(0);
     const [dolarHoy, setDolarHoy] = useState(1000);
-    const [aceptaDolares, setAceptaDolares] = useState(false);
+    const [aceptaDolares, setAceptaDolares] = useState(true);
 
     const [precioDolares, setPrecioDolares] = useState(0);
     const [precio, setPrecio] = useState(0);
@@ -127,8 +127,7 @@ export default function CabaMap() {
             fullCopy.map((barrio) => {
                 const totales = alquileres.filter((a) => {
                     const b_ind = barrios[parseInt(a.BARRIO)]
-                    if (aceptaDolares) return barrio.properties['BARRIO'] === b_ind
-                    else return barrio.properties['BARRIO'] === b_ind && a.CURRENCY !== "USD"
+                    return barrio.properties['BARRIO'] === b_ind
                 }).length
 
                 const disponibles = alquileres.filter((a) => {
@@ -152,7 +151,7 @@ export default function CabaMap() {
     
             setFiltered(dataFiltered)
 
-            console.log(dataFiltered)
+            // console.log(dataFiltered)
     
         }
 
