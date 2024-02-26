@@ -111,3 +111,21 @@ body {
   font-family: 'Roboto Slab', serif;
   overflow: hidden;
 }
+
+.MuiStepConnector-root {
+  height: 10px;
+  overflow: hidden;
+}
+
+.MuiStepLabel-root {
+  padding: 4px 0;
+  margin-top: 4px;
+}
+
+.MuiCollapse-wrapperInner > form {
+  margin-bottom: 8px;
+}
+
+.MuiAlert-message {
+  padding: 4px 0;
+}

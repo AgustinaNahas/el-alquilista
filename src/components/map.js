@@ -2,16 +2,31 @@ import { useEffect, useRef, useState } from 'react';
 import data from './data.js';
 import caba from './caba.js';
 
+import CloseIcon from '@mui/icons-material/Close';
+
 import Map, {
     Source,
     Layer,
   } from "react-map-gl";
-import { Slider, Typography } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, Fab, IconButton, Modal, Slider, Typography, styled, Link as MuiLink } from '@mui/material';
 import Cuadro from './cuadro.js';
 import { IsMobile } from '../utils/mobile.js';
 import getAlquileres from './alquileres.js';
 import getDolarHoy from './dolarHoy.js';
+import Refes from './refes.js';
+import { Info } from '@mui/icons-material';
 
+import Link from 'next/link.js';
+
+
+const BootstrapDialog = styled(Dialog)(({ theme }) => ({
+    '& .MuiDialogContent-root': {
+      padding: theme.spacing(2),
+    },
+    '& .MuiDialogActions-root': {
+      padding: theme.spacing(1),
+    },
+  }));
 
 export default function CabaMap() {
     
@@ -26,7 +41,6 @@ export default function CabaMap() {
 
     const [precioDolares, setPrecioDolares] = useState(0);
     const [precio, setPrecio] = useState(0);
-
 
     const barrios = ["Chacarita",
     "Paternal",
@@ -78,6 +92,15 @@ export default function CabaMap() {
     "BOCA"]
 
     const mobile = IsMobile();
+
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => {
+        setOpen(true);
+    };
+    const handleClose = () => {
+        setOpen(false);
+    };
+
 
     useEffect(() => {
         caba.features.map((f) => {
@@ -172,7 +195,7 @@ export default function CabaMap() {
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
             {filtered && (mobile ? <Map
-                mapStyle="mapbox://styles/mapbox/streets-v9"
+                mapStyle="mapbox://styles/mapbox/dark-v11"
                 mapboxAccessToken={process.env.NEXT_PUBLIC_TOKEN}
                 boxZoom={false}
                 // scrollZoom={false}
@@ -217,6 +240,7 @@ export default function CabaMap() {
                         </Layer>
                     </Source>                
             </Map>)}
+            <Refes/>
             <Cuadro 
                 filtered={filtered} 
                 sueldo={sueldo} setSueldo={setSueldo} 
@@ -224,6 +248,41 @@ export default function CabaMap() {
                 paso={paso} setPaso={setPaso}
                 aceptaDolares={aceptaDolares} setAceptaDolares={setAceptaDolares}
                 />
+            <Fab color="secondary" aria-label="info" onClick={handleOpen} style={{ position: "absolute", bottom: 20, left: 20 }}>
+                <Info />
+            </Fab>
+            <BootstrapDialog
+                onClose={handleClose}
+                aria-labelledby="customized-dialog-title"
+                open={open}
+            >
+                <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
+                Fuentes
+                </DialogTitle>
+                <IconButton
+                aria-label="close"
+                onClick={handleClose}
+                sx={{
+                    position: 'absolute',
+                    right: 8,
+                    top: 8,
+                    color: (theme) => theme.palette.grey[500],
+                }}
+                >
+                <CloseIcon />
+                </IconButton>
+                <DialogContent dividers>
+                <Typography gutterBottom>
+                    <MuiLink color="secondary"><Link target="_blank" href="https://www.boletinoficial.gob.ar/detalleAviso/primera/302875/20240221">Salario mínimo vital y movil</Link></MuiLink> (Última actualización: 15 feb 2024)
+                </Typography>
+                <Typography gutterBottom>
+                    <MuiLink color="secondary"><Link target="_blank" href="https://docs.google.com/spreadsheets/d/1DguVTyzAWadeUkkzokNIAQSDuQklfzFX7CwEfkkCnpc/edit?usp=sharing">Lista de alquileres completos de ZonaProp</Link></MuiLink> (Última actualización: 19 feb 2024)
+                </Typography>
+                <Typography gutterBottom>
+                    <MuiLink color="secondary"><Link target="_blank" href="https://dolarapi.com">Dolar Hoy</Link></MuiLink> (Última actualización: hoy)
+                </Typography>
+                </DialogContent>
+            </BootstrapDialog>
         </div>
         
     );

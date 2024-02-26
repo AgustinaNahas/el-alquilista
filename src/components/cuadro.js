@@ -1,6 +1,11 @@
-import { Box, Button, Chip, FormControlLabel, FormGroup, Hidden, Slider, Step, StepContent, StepLabel, Stepper, Switch, TextField, Typography, styled } from '@mui/material';
+import { Alert, Box, Button, Chip, FormControlLabel, FormGroup, Hidden, Slider, Step, StepContent, StepLabel, Stepper, Switch, TextField, Typography, styled } from '@mui/material';
 import { IsMobile } from '../utils/mobile';
 import { useEffect, useState } from 'react';
+
+import HomeIcon from '@mui/icons-material/Home';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+
+import styles from './styles.module.css'
 
 const Container = styled('div')`
   position: fixed;
@@ -58,17 +63,73 @@ const StyledBox = styled(Box)`
   }
 `
 
-export default function Cuadro({sueldo, setSueldo, filtered, porcentaje, setPorcentaje, paso, setPaso, aceptaDolares, setAceptaDolares}) {
+const steps = [
+  {
+    label: 'Ingresá tu sueldo',
+    content: ({sueldo, esSueldazo}) => {
+      return <>
+        {/* <CTA variant="h5" >Ingresá tu sueldo</CTA> */}
+        <StyledBox
+          component="form"
+          noValidate
+          autoComplete="off"
+          sx={{ mb: { xs: 2, md: 20 } }}
+        >
+          <Slider min={100000} max={1500000} step={10000} defaultValue={210000} aria-label="Default" 
+            valueLabelDisplay="none" color="secondary" value={sueldo} onChange={(a) => esSueldazo(a.target.value) } />
+          
+        </StyledBox>
+        <Box style={{ display: "flex", justifyContent: "space-between" }}>
+            <Chip label="Sueldo mínimo" variant="outlined" color="secondary" onClick={() => esSueldazo(156000)} />
+            <Chip label="Sueldo promedio" variant="outlined" color="secondary" onClick={() => esSueldazo(484000)} />
+          </Box>
+      </>
+    }
+  },
+  {
+    label: 'Ingresá el porcentaje de tu sueldo destinado al alquiler',
+    content: ({porcentaje, setPorcentaje, setPorcentajeChanged}) => {
+      return <Box
+      component="form"
+      noValidate
+      autoComplete="off"
+      sx={{ mb: { xs: 2, md: 20 } }}
+    >
+      <Slider min={0} max={100} step={10} defaultValue={100} aria-label="Default" 
+        valueLabelDisplay="auto" color="secondary" value={porcentaje} onChange={(a) => {setPorcentaje(a.target.value); setPorcentajeChanged(true);} } />
+    </Box>
+
+
+    },
+  },
+  {
+    label: 'Acepta dólares',
+    content: ({aceptaDolares, setAceptaDolares}) => {
+      return <FormGroup color="secondary">
+        <FormControlLabel color="secondary" control={<Switch color="secondary" checked={aceptaDolares} onChange={(a) => {setAceptaDolares((a) => !a)}} />} label="Pago en dólares" />
+      </FormGroup>
+    }
+  },
+];
+
+export default function Cuadro({sueldo, setSueldo, filtered, porcentaje, setPorcentaje, aceptaDolares, setAceptaDolares}) {
 
   const mobile = IsMobile();
 
   const [barriosDisponibles, setBarriosDisponibles] = useState(0)
 
   const [activeStep, setActiveStep] = useState(0);
+  const [alert, setAlert] = useState(null);
+  const [sueldoChanged, setSueldoChanged] = useState(false);
+  const [porcentajeChanged, setPorcentajeChanged] = useState(false);
+
+
+  const [maxStep, setMaxStep] = useState(0);
+
 
   const esSueldazo = (s) => {
+    setSueldoChanged(true)
     setSueldo(s); 
-    if (s > 484000) setPaso(1)
   }
 
   useEffect(() => {
@@ -77,58 +138,39 @@ export default function Cuadro({sueldo, setSueldo, filtered, porcentaje, setPorc
     else setBarriosDisponibles(filtered.features.filter((b) => b.properties.porcentaje > 70).length)
   }, [filtered])
 
-  const steps = [
-    {
-      label: 'Ingresá tu sueldo',
-      content: () => {
-        return <>
-          {/* <CTA variant="h5" >Ingresá tu sueldo</CTA> */}
-          <StyledBox
-            component="form"
-            noValidate
-            autoComplete="off"
-            sx={{ mb: { xs: 2, md: 20 } }}
-          >
-            <Slider min={100000} max={1500000} step={10000} defaultValue={210000} aria-label="Default" 
-              valueLabelDisplay="none" color="secondary" value={sueldo} onChange={(a) => esSueldazo(a.target.value) } />
-            <StyledTextField id="outlined-basic" label={"Sueldo"} variant="standard" color="secondary" focused 
-              value={sueldo} size={"small"} onChange={(a) => esSueldazo(a.target.value) } />
-          </StyledBox>
-        </>
-      }
-    },
-    {
-      label: 'Ingresá el porcentaje de tu sueldo destinado al alquiler',
-      content: () => {
-        return <Box
-        component="form"
-        noValidate
-        autoComplete="off"
-        sx={{ mb: { xs: 2, md: 20 } }}
-        style={{ display: paso === 1 ? "block" : "none" }}
-      >
-        {/* <CTA variant="h5" style={{ display: "block !important", fontSize: 14, fontWeight: 300, fontFamily: '"Roboto","Helvetica","Arial",sans-serif' }} >Ingresá el porcentaje de tu sueldo destinado al alquiler</CTA> */}
-        <Slider min={0} max={100} step={10} defaultValue={100} aria-label="Default" 
-          valueLabelDisplay="auto" color="secondary" value={porcentaje} onChange={(a) => setPorcentaje(a.target.value) } />
-      </Box>
+
+  useEffect(() => {
+    if (activeStep > maxStep) setMaxStep(activeStep)
+
+    if (activeStep === 0 && maxStep === 0) {
+      if (!sueldoChanged) setAlert({severity: "info", text: "Ingresá tu sueldo para mostrarte en qué barrios de Capital Federal podés alquilar."})
+    } 
+    if (sueldoChanged) {
+      if (barriosDisponibles <= 0) setAlert({severity: "error", text: "Con ese presupuesto no hay deptos en alquiler en CABA."})
+      else if (barriosDisponibles > 0 && barriosDisponibles < 8) setAlert({severity: "warning", text: "No pareciera que haya muchos barrios para alquilar con ese presupuesto."})
+      else if (barriosDisponibles >= 8 && barriosDisponibles < 35) setAlert({severity: "warning", text: "Ese presupuesto nos da algunas opciones para alquilar."})
+      else if (barriosDisponibles >= 35) {
+        if (activeStep === 0 && maxStep <= 0 || !porcentajeChanged) setAlert({severity: "success", text: "Ese presupuesto nos permite alquilar en mayor parte de la ciudad. Pero qué porcentaje de tu sueldo estás dispuesto a destinar al alquiler?"})
+        else if (activeStep === 1 && maxStep <= 1) setAlert({severity: "success", text: "Ese presupuesto nos permite alquilar en mayor parte de la ciudad. Pero estás dispuesto a pagar en dólares, cierto?"})
+        else setAlert({severity: "success", text: "Ese presupuesto nos permite alquilar en mayor parte de la ciudad."})
+      }      
+
+      
+    }
 
 
-      }
-    },
-    {
-      label: 'Acepta dólares',
-      content: () => {
-        return <FormGroup color="secondary">
-          <FormControlLabel color="secondary" control={<Switch color="secondary" checked={aceptaDolares} onChange={(a) => {setAceptaDolares((a) => !a)}} />} label="Pago en dólares" />
-        </FormGroup>
-      }
-    },
-  ];
+  }, [activeStep, sueldoChanged, porcentajeChanged, sueldo, porcentaje, aceptaDolares, barriosDisponibles])
 
     return (
-            <Container color="secondary">
-                <Title variant="h3" color="secondary">El Alquilista</Title>
+            <Container color="secondary" className={styles.container}>
+                <Title variant="h3" color="secondary" style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                  <div style={{ position: "relative", marginRight: 10  }}>
+                  <HomeIcon  style={{ fontSize: 32}}/><AttachMoneyIcon style={{ fontSize: 10, position: "absolute", left: 11, top: 8, color: "#3C3C3B" }} />
+                  </div>
+                  El Alquilista
+                  </Title>
                 <Box sx={{ maxWidth: 400 }} color="secondary">
+                  {alert && <Alert severity={alert.severity}>{alert.text}</Alert>}
                   <Stepper activeStep={activeStep} nonLinear={true} orientation="vertical" color="secondary">
                     {steps.map((step, index) => {
                       const Content = step.content;
@@ -143,28 +185,26 @@ export default function Cuadro({sueldo, setSueldo, filtered, porcentaje, setPorc
                           },                          
                           '& .MuiStepLabel-root .Mui-active .MuiStepIcon-text': {
                             fill: 'black', // circle's number (ACTIVE)
-                          },
+                          }
                         }}>
-                                      <StepLabel color="secondary"
+                      <StepLabel color="secondary"
                         optional={
-                          index === 0 ? sueldo : 
-                          (index === 1 ? porcentaje + "%" : (aceptaDolares?"Sí": "No")) 
+                          maxStep >= index ? (index === 0 ? sueldo : 
+                          (index === 1 ? porcentaje + "%" : (aceptaDolares?"Sí": "No")) ) : ''
                         }
                       >
                         {step.label}
                       </StepLabel>
                       <StepContent color="secondary">
-                        <Content/>
+                        <Content sueldo={sueldo} esSueldazo={esSueldazo} 
+                          porcentaje={porcentaje} setPorcentaje={setPorcentaje} setPorcentajeChanged={setPorcentajeChanged}
+                          aceptaDolares={aceptaDolares} setAceptaDolares={setAceptaDolares}
+                          />
                       </StepContent>
                     </Step>
                     })}
                   </Stepper>
                 </Box>
-
-                {barriosDisponibles <= 0 && <Typography component="h2">Con ese presupuesto no hay deptos en alquiler en CABA</Typography>}
-                {barriosDisponibles > 0 && barriosDisponibles < 8 && <Typography component="h2">No pareciera que haya muchos barrios para alquilar con ese presupuesto</Typography>}
-                {barriosDisponibles >= 8 && barriosDisponibles < 35 && <Typography component="h2">Ese presupuesto nos da algunas opciones para alquilar</Typography>}
-                {barriosDisponibles >= 35 && <Typography component="h2">Bien, ese presupuesto nos permite alquilar en mayor parte de la ciudad</Typography>}
 
       </Container>
     );
