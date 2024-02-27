@@ -47,6 +47,18 @@ const CTA = styled(Typography)`
   }
 `
 
+const MoneyIcon = styled(AttachMoneyIcon)`
+  font-size: 10px; 
+  position: absolute;
+  left: 11px;
+  top: 8px;
+  color: #3C3C3B;
+
+  ${props => props.theme.breakpoints.up("md")} {
+    top: 22px;
+  }
+`
+
 const StyledTextField = styled(TextField)`
   width: 35%; 
   ${props => props.theme.breakpoints.up("md")} {
@@ -165,7 +177,7 @@ export default function Cuadro({sueldo, setSueldo, filtered, porcentaje, setPorc
             <Container color="secondary" className={styles.container}>
                 <Title variant="h3" color="secondary" style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                   <div style={{ position: "relative", marginRight: 10  }}>
-                  <HomeIcon  style={{ fontSize: 32}}/><AttachMoneyIcon style={{ fontSize: 10, position: "absolute", left: 11, top: 8, color: "#3C3C3B" }} />
+                  <HomeIcon  style={{ fontSize: 32}}/><MoneyIcon />
                   </div>
                   El Alquilista
                   </Title>
@@ -188,6 +200,7 @@ export default function Cuadro({sueldo, setSueldo, filtered, porcentaje, setPorc
                           }
                         }}>
                       <StepLabel color="secondary"
+                      style={{ cursor: "pointer" }}
                         optional={
                           maxStep >= index ? (index === 0 ? sueldo : 
                           (index === 1 ? porcentaje + "%" : (aceptaDolares?"Sí": "No")) ) : ''
