@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import data from './data.js';
 import caba from './caba.js';
 
@@ -6,9 +6,9 @@ import CloseIcon from '@mui/icons-material/Close';
 
 import Map, {
     Source,
-    Layer,
+    Layer
   } from "react-map-gl";
-import { Dialog, DialogContent, DialogTitle, Fab, IconButton, Modal, Slider, Typography, styled, Link as MuiLink } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, Fab, IconButton, Typography, styled, Link as MuiLink } from '@mui/material';
 import Cuadro from './cuadro.js';
 import { IsMobile } from '../utils/mobile.js';
 import getAlquileres from './alquileres.js';
@@ -18,6 +18,20 @@ import { Info } from '@mui/icons-material';
 
 import Link from 'next/link.js';
 
+
+const Tooltip = styled('div')`
+    position: absolute;
+    background: #3C3C3B;
+    max-width: 150px;
+    padding: 8px;
+    border-radius: 2px;
+    transform: translate(-50%, -100%);
+  ${props => props.theme.breakpoints.up("md")} {
+    // padding: 50px;
+    // width: 40vw;
+    // min-height: 100vh;
+  }
+`
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -101,6 +115,8 @@ export default function CabaMap() {
         setOpen(false);
     };
 
+  const [hoverInfo, setHoverInfo] = useState(null);
+
 
     useEffect(() => {
         caba.features.map((f) => {
@@ -142,6 +158,17 @@ export default function CabaMap() {
         console.log(sueldo * (porcentaje/100) / dolarHoy, sueldo * (porcentaje/100))
     }, [sueldo, porcentaje, aceptaDolares]);
 
+    const onHover = useCallback(event => {
+        const {
+          features,
+          point: {x, y}
+        } = event;
+
+        const hoveredFeature = features && features[0];
+    
+        setHoverInfo(hoveredFeature && {feature: hoveredFeature, x, y});
+      }, []);
+
     useEffect(() => {
         if (fullData && fullData.features && alquileres.length > 0) {
 
@@ -180,7 +207,12 @@ export default function CabaMap() {
 
     }, [fullData, alquileres, precio, precioDolares, aceptaDolares ])
 
+    const capitalize = (string) => {
+        return string.split(' ').map((s) => s.charAt(0).toUpperCase() + s.toLowerCase().slice(1)).join(" ");
+    }
+
     const layerStyle = {
+        'id': 'barrios-layer',
         'type': 'fill',
         'source-id': 'barrios',
         'paint': {              
@@ -203,7 +235,8 @@ export default function CabaMap() {
                     height: '100vh',
                     width: '100vw'
                 }}
-                onMove={(a) => {}}
+                onMouseDown={(a) => {onHover(a);}}
+                onMove={() => setHoverInfo(null)}
                 onLoad={(a) => {
                     a.target.setZoom(10.20)
                     for (let index = 0; index < 100000; index++) {
@@ -211,6 +244,7 @@ export default function CabaMap() {
                     }
                     a.target.flyTo({ center: [-58.45689200256368, -34.55322214007016] })
                 }}
+                interactiveLayerIds={['barrios-layer']}
                 initialViewState={{
                     longitude: -58.44493682767809, 
                     latitude: -34.46406573521092, 
@@ -219,9 +253,16 @@ export default function CabaMap() {
                     <Source id="barrios" type="geojson" data={filtered}>
                         <Layer {...layerStyle}>
                         </Layer>
-                    </Source>                
+                    </Source>       
+                    {/* {showPopup && (
+                    <Popup longitude={-58.44493682767809} latitude={-34.46406573521092}
+                        anchor="bottom"
+                        onClose={() => setShowPopup(false)}>
+                        You are here
+                    </Popup>)}           */}
+         
             </Map> : <Map
-                mapStyle="mapbox://styles/mapbox/streets-v9"
+                mapStyle="mapbox://styles/mapbox/dark-v11"
                 mapboxAccessToken={process.env.NEXT_PUBLIC_TOKEN}
                 boxZoom={false}
                 // scrollZoom={false}
@@ -229,7 +270,8 @@ export default function CabaMap() {
                     height: '100vh',
                     width: '100vw'
                 }}
-                // onMove={(a) => {console.log(a)}}
+                interactiveLayerIds={['barrios-layer']}
+                onMouseMove={(a) => {onHover(a);}}
                 initialViewState={{
                     longitude: -58.50330169991081, 
                     latitude: -34.61621393391216, 
@@ -238,8 +280,14 @@ export default function CabaMap() {
                     <Source id="barrios" type="geojson" data={filtered}>
                         <Layer {...layerStyle}>
                         </Layer>
-                    </Source>                
+                    </Source>       
             </Map>)}
+            {hoverInfo && (
+                <Tooltip style={{left: hoverInfo.x, top: hoverInfo.y - 5}}>
+                    <b>{capitalize(hoverInfo.feature.properties.BARRIO)}</b>
+                    <div>Disponibilidad para vos: {hoverInfo.feature.properties.disponibles}/{hoverInfo.feature.properties.totales}</div>
+                </Tooltip>
+            )}     
             <Refes/>
             <Cuadro 
                 filtered={filtered} 
