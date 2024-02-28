@@ -92,7 +92,7 @@ const steps = [
           
         </StyledBox>
         <Box style={{ display: "flex", justifyContent: "space-between" }}>
-            <Chip label="Sueldo mínimo" variant="outlined" color="secondary" onClick={() => esSueldazo(156000)} />
+            <Chip label="Sueldo mínimo" variant="outlined" color="secondary" onClick={() => esSueldazo(180000)} />
             <Chip label="Sueldo promedio" variant="outlined" color="secondary" onClick={() => esSueldazo(484000)} />
           </Box>
       </>
@@ -106,9 +106,12 @@ const steps = [
       noValidate
       autoComplete="off"
       sx={{ mb: { xs: 2, md: 20 } }}
+      style={{ display: "flex", gap: 20 }}
     >
       <Slider min={0} max={100} step={10} defaultValue={100} aria-label="Default" 
         valueLabelDisplay="auto" color="secondary" value={porcentaje} onChange={(a) => {setPorcentaje(a.target.value); setPorcentajeChanged(true);} } />
+      <Chip label="Sugerido (30%)" variant="outlined" style={{ marginTop: 6 }} color="secondary" onClick={() => {setPorcentaje(30); setPorcentajeChanged(true);}} />
+
     </Box>
 
 
@@ -155,18 +158,20 @@ export default function Cuadro({sueldo, setSueldo, filtered, porcentaje, setPorc
     if (activeStep > maxStep) setMaxStep(activeStep)
 
     if (activeStep === 0 && maxStep === 0) {
-      if (!sueldoChanged) setAlert({severity: "info", text: "Ingresá tu sueldo para mostrarte en qué barrios de Capital Federal podés alquilar."})
+      if (!sueldoChanged) setAlert({severity: "info", text: "Ingresá tu sueldo así evaluamos en qué barrios podrías vivir."})
     } 
     if (sueldoChanged) {
-      if (barriosDisponibles <= 0) setAlert({severity: "error", text: "Con ese presupuesto no hay deptos en alquiler en CABA."})
-      else if (barriosDisponibles > 0 && barriosDisponibles < 8) setAlert({severity: "warning", text: "No pareciera que haya muchos barrios para alquilar con ese presupuesto."})
-      else if (barriosDisponibles >= 8 && barriosDisponibles < 35) setAlert({severity: "warning", text: "Ese presupuesto nos da algunas opciones para alquilar."})
-      else if (barriosDisponibles >= 35) {
-        if (activeStep === 0 && maxStep <= 0 || !porcentajeChanged) setAlert({severity: "success", text: "Ese presupuesto nos permite alquilar en mayor parte de la ciudad. Pero qué porcentaje de tu sueldo estás dispuesto a destinar al alquiler?"})
-        else if (activeStep === 1 && maxStep <= 1) setAlert({severity: "success", text: "Ese presupuesto nos permite alquilar en mayor parte de la ciudad. Pero estás dispuesto a pagar en dólares, cierto?"})
-        else setAlert({severity: "success", text: "Ese presupuesto nos permite alquilar en mayor parte de la ciudad."})
+      if (barriosDisponibles < 8) setAlert({severity: "error", text: "No pareciera que haya muchos barrios para alquilar con ese presupuesto."})
+      else if (barriosDisponibles >= 8 && barriosDisponibles < 25){
+        if (activeStep === 0 && maxStep <= 0 || !porcentajeChanged) setAlert({severity: "warning", text: "Ese presupuesto nos da algunas opciones para alquilar. Ahora contanos qué porcentaje de tu sueldo querés destinar a vivienda, así tenemos en cuenta tus otros gastos."})
+        else if (activeStep <= 1 && maxStep <= 1) setAlert({severity: "warning", text: "Ese presupuesto nos da algunas opciones para alquilar. Pero estás dispuesto a pagar en dólares, ¿cierto?"})
+        else setAlert({severity: "warning", text: "Destinando un " + porcentaje + "% de tu sueldo de $" + sueldo + " (es decir, $" + parseInt(sueldo * (porcentaje/100)) + ") tenés opciones de alquiler en el " + parseInt((barriosDisponibles/48)*100)  + "% de los barrios de Capital Federal." })
+      } 
+      else if (barriosDisponibles >= 25) {
+        if (activeStep === 0 && maxStep <= 0 || !porcentajeChanged) setAlert({severity: "success", text: "Ese presupuesto nos da bastantes opciones. Ahora contanos qué porcentaje de tu sueldo querés destinar a vivienda, así tenemos en cuenta tus otros gastos."})
+        else if (activeStep <= 1 && maxStep <= 1) setAlert({severity: "success", text: "Ese presupuesto nos permite alquilar en mayor parte de la ciudad. Pero estás dispuesto a pagar en dólares, ¿cierto?"})
+        else setAlert({severity: "success", text: "Destinando un " + porcentaje + "% de tu sueldo de $" + sueldo + " (es decir, $" + parseInt(sueldo * (porcentaje/100)) + ") tenés opciones de alquiler en el " + parseInt((barriosDisponibles/48)*100)  + "% de los barrios de Capital Federal." })
       }      
-
       
     }
 

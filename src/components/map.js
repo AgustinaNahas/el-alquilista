@@ -8,7 +8,7 @@ import Map, {
     Source,
     Layer
   } from "react-map-gl";
-import { Dialog, DialogContent, DialogTitle, Fab, IconButton, Typography, styled, Link as MuiLink } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, Fab, IconButton, Typography, styled, Link as MuiLink, DialogActions, Button } from '@mui/material';
 import Cuadro from './cuadro.js';
 import { IsMobile } from '../utils/mobile.js';
 import getAlquileres from './alquileres.js';
@@ -108,11 +108,15 @@ export default function CabaMap() {
     const mobile = IsMobile();
 
     const [open, setOpen] = useState(false);
+    const [open2, setOpen2] = useState(true);
     const handleOpen = () => {
         setOpen(true);
     };
     const handleClose = () => {
         setOpen(false);
+    };
+    const handleClose2 = () => {
+        setOpen2(false);
     };
 
   const [hoverInfo, setHoverInfo] = useState(null);
@@ -330,6 +334,40 @@ export default function CabaMap() {
                     <MuiLink color="secondary"><Link target="_blank" href="https://dolarapi.com">Dolar Hoy</Link></MuiLink> (Última actualización: hoy)
                 </Typography>
                 </DialogContent>
+            </BootstrapDialog>
+            <BootstrapDialog
+                onClose={handleClose2}
+                aria-labelledby="customized-dialog-title"
+                open={open2}
+            >
+                <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
+                    El Alquilista
+                </DialogTitle>
+                <IconButton
+                aria-label="close"
+                onClick={handleClose2}
+                sx={{
+                    position: 'absolute',
+                    right: 8,
+                    top: 8,
+                    color: (theme) => theme.palette.grey[500],
+                }}
+                >
+                    <CloseIcon />
+                </IconButton>
+                <DialogContent dividers>
+                    <Typography gutterBottom>
+                        Te damos la bienvenida a El Alquilista. 
+                    </Typography>
+                    <Typography gutterBottom>
+                        En esta página te vamos a ayudar a buscar un departamento para alquilar, acorde con tu sueldo.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button color="secondary" onClick={handleClose2} autoFocus>
+                        Aceptar
+                    </Button>
+                </DialogActions>
             </BootstrapDialog>
         </div>
         
