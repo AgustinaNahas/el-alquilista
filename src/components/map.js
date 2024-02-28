@@ -360,7 +360,7 @@ export default function CabaMap() {
                         Te damos la bienvenida a El Alquilista. 
                     </Typography>
                     <Typography gutterBottom>
-                        En esta página te vamos a ayudar a buscar un departamento para alquilar, acorde con tu sueldo.
+                        En esta página queremos ayudarte a buscar un departamento para alquilar, acorde con tu sueldo.
                     </Typography>
                 </DialogContent>
                 <DialogActions>
