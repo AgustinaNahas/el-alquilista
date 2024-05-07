@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import HomeIcon from '@mui/icons-material/Home';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 
+import { event } from "nextjs-google-analytics";
+
 import styles from './styles.module.css'
 
 const Container = styled('div')`
@@ -87,13 +89,13 @@ const steps = [
           autoComplete="off"
           sx={{ mb: { xs: 2, md: 20 } }}
         >
-          <Slider min={100000} max={1500000} step={10000} defaultValue={210000} aria-label="Default" 
+          <Slider min={180000} max={1800000} step={10000} defaultValue={450000} aria-label="Default" 
             valueLabelDisplay="none" color="secondary" value={sueldo} onChange={(a) => esSueldazo(a.target.value) } />
           
         </StyledBox>
         <Box style={{ display: "flex", justifyContent: "space-between" }}>
-            <Chip label="Sueldo mínimo" variant="outlined" color="secondary" onClick={() => esSueldazo(180000)} />
-            <Chip label="Sueldo promedio" variant="outlined" color="secondary" onClick={() => esSueldazo(484000)} />
+            <Chip label="Sueldo mínimo" variant="outlined" color="secondary" onClick={() => esSueldazo(234000)} />
+            <Chip label="Sueldo promedio" variant="outlined" color="secondary" onClick={() => esSueldazo(595000)} />
           </Box>
       </>
     }
@@ -144,6 +146,12 @@ export default function Cuadro({sueldo, setSueldo, filtered, porcentaje, setPorc
 
   const esSueldazo = (s) => {
     setSueldoChanged(true)
+
+    event("submit_form", {
+      category: "Sueldo",
+      label: s,
+    });
+
     setSueldo(s); 
   }
 
