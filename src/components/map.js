@@ -333,6 +333,14 @@ export default function CabaMap() {
                 <Typography gutterBottom>
                     <MuiLink color="secondary"><Link target="_blank" href="https://dolarapi.com">Dolar Hoy</Link></MuiLink> (Última actualización: hoy)
                 </Typography>
+                <br/>
+                <br/>
+                <Typography gutterBottom>
+                    <MuiLink color="secondary"><Link target="_blank" href="https://www.notion.so/agusnahas/Agustina-Nahas-75b175948cf0415a885f8a148e94b1b7">Sobre mí</Link></MuiLink>
+                </Typography>
+                <Typography gutterBottom>
+                    <MuiLink color="secondary"><Link target="_blank" href="https://github.com/AgustinaNahas/el-alquilista">Repo público</Link></MuiLink>
+                </Typography>
                 </DialogContent>
             </BootstrapDialog>
             <BootstrapDialog
