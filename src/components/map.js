@@ -47,7 +47,7 @@ export default function CabaMap() {
     const [fullData, setFullData] = useState([]);
     const [filtered, setFiltered] = useState([]);
     const [alquileres, setAlquileres] = useState([]);
-    const [sueldo, setSueldo] = useState(234000);
+    const [sueldo, setSueldo] = useState(350000);
     const [porcentaje, setPorcentaje] = useState(100);
     const [paso, setPaso] = useState(0);
     const [dolarHoy, setDolarHoy] = useState(1000);
@@ -159,7 +159,7 @@ export default function CabaMap() {
         if (aceptaDolares) setPrecioDolares(sueldo * (porcentaje/100) / dolarHoy)
         setPrecio(sueldo * (porcentaje/100))
 
-        console.log(sueldo * (porcentaje/100) / dolarHoy, sueldo * (porcentaje/100))
+        // console.log(sueldo * (porcentaje/100) / dolarHoy, sueldo * (porcentaje/100))
     }, [sueldo, porcentaje, aceptaDolares]);
 
     const onHover = useCallback(event => {
@@ -325,10 +325,10 @@ export default function CabaMap() {
                 </IconButton>
                 <DialogContent dividers>
                 <Typography gutterBottom>
-                    <MuiLink color="secondary"><Link target="_blank" href="https://www.boletinoficial.gob.ar/detalleAviso/primera/306740/20240503">Salario mínimo vital y movil</Link></MuiLink> (Última actualización: 6 may 2024)
+                    <MuiLink color="secondary"><Link target="_blank" href="https://www.boletinoficial.gob.ar/detalleAviso/primera/311320/20240726">Salario mínimo vital y movil</Link></MuiLink> (Última actualización: 6 agosto 2024)
                 </Typography>
                 <Typography gutterBottom>
-                    <MuiLink color="secondary"><Link target="_blank" href="https://docs.google.com/spreadsheets/d/1DguVTyzAWadeUkkzokNIAQSDuQklfzFX7CwEfkkCnpc/edit?usp=sharing">Lista de alquileres completos de ZonaProp</Link></MuiLink> (Última actualización: 6 mayo 2024)
+                    <MuiLink color="secondary"><Link target="_blank" href="https://docs.google.com/spreadsheets/d/1DguVTyzAWadeUkkzokNIAQSDuQklfzFX7CwEfkkCnpc">Lista de alquileres completos de ZonaProp</Link></MuiLink> (Última actualización: 6 agosto 2024)
                 </Typography>
                 <Typography gutterBottom>
                     <MuiLink color="secondary"><Link target="_blank" href="https://dolarapi.com">Dolar Hoy</Link></MuiLink> (Última actualización: hoy)

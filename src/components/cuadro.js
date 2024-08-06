@@ -89,12 +89,12 @@ const steps = [
           autoComplete="off"
           sx={{ mb: { xs: 2, md: 20 } }}
         >
-          <Slider min={180000} max={1800000} step={10000} defaultValue={450000} aria-label="Default" 
+          <Slider min={200000} max={1800000} step={10000} defaultValue={450000} aria-label="Default" 
             valueLabelDisplay="none" color="secondary" value={sueldo} onChange={(a) => esSueldazo(a.target.value) } />
           
         </StyledBox>
         <Box style={{ display: "flex", justifyContent: "space-between" }}>
-            <Chip label="Sueldo mínimo" variant="outlined" color="secondary" onClick={() => esSueldazo(234000)} />
+            <Chip label="Sueldo mínimo" variant="outlined" color="secondary" onClick={() => esSueldazo(255000)} />
             <Chip label="Sueldo promedio" variant="outlined" color="secondary" onClick={() => esSueldazo(595000)} />
           </Box>
       </>

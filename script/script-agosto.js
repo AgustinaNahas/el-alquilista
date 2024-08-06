@@ -10,19 +10,28 @@ function delay(time) {
 
 async function pagina(page, i) {
 
-    const ids = await page.$$('div.PostingCardLayout-sc-i1odl-0')
+    const ids = await page.$$('div.listing__item a')
+
+    // console.log(ids)
 
     let resultIds = await Promise.all(ids.map(async (t) => {
-        return await t.evaluate(x => x.getAttribute('data-id'));
+        return await t.evaluate(x => x.getAttribute('data-item-card'));
     }))
 
-    const precio = await page.$$('div.Price-sc-12dh9kl-3')
+    let resultPrice = await Promise.all(ids.map(async (t) => {
+        return await t.evaluate(x => x.getAttribute('data-track-montooperacion'));
+    }))
 
-    let resultPrecio = await Promise.all(precio.map(async (t) => {
+    // console.log(resultIds)
+    // console.log(resultPrice)
+
+    const currency = await page.$$('div.listing__item .card__currency')
+
+    let resultCurrency = await Promise.all(currency.map(async (t) => {
         return await t.evaluate(x => x.textContent);
     }))
 
-    const location = await page.$$('.LocationLocation-sc-ge2uzh-2')
+    const location = await page.$$('div.listing__item .card__title--primary')
 
     let resultLocation = await Promise.all(location.map(async (t) => {
         return await t.evaluate(x => x.textContent);
@@ -30,18 +39,24 @@ async function pagina(page, i) {
 
     var resultTotales = []
 
-    for (let index = 0; index < resultPrecio.length; index++) {
-        resultTotales.push({pagina: i, id: resultIds[index], precio: resultPrecio[index], location: resultLocation[index]})
+    for (let index = 0; index < resultPrice.length; index++) {
+        resultTotales.push({
+          pagina: i, 
+          id: resultIds[index], 
+          precio: resultPrice[index], 
+          currency: resultCurrency[index], 
+          location: resultLocation[index]})
+
     }
 
-    await page.$eval( 'a.PageArrow-sc-n5babu-2', form => form.click() );
+    // await page.$eval( '.pagination__page-next a', form => form.click() );
 
 
-    await delay(5000)
+    await delay(2000)
 
     
 
-    // console.log(resultTotales);
+    console.log(resultTotales);
 
     // page.close()
 
@@ -56,13 +71,16 @@ async function coso(){
     const page = await browser.newPage();
     await page.setViewport({ width: 1366, height: 2000});
 
-    await page.goto('https://www.zonaprop.com.ar/departamentos-alquiler-capital-federal.html');
+    // await page.goto('https://www.argenprop.com/departamentos/alquiler/capital-federal/');
 
     // pagina(browser, 0)
 
     var totales = []
-    for (let index = 0; index < 100; index++) {
-        console.log(index)
+    for (let index = 409; index < 422; index++) {
+        await page.goto('https://www.argenprop.com/departamentos/alquiler/capital-federal' + (index ? '?pagina-' + index : ''));
+
+        if(index === 409) await delay(10000)
+
         const x = await pagina(page, index)
         totales = [...totales, ...x];
     }
